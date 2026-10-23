@@ -6,6 +6,13 @@
     
 
 _start:
+
+    MOV     X0, #0              // a lsb
+    MOV     X1, #1              // a msb
+    MOV     X2, #0              // b lsb
+    MOV     X3, #0              // b msb
+
+
     CMP     X0, X2              // resta lsb X0 - X2
     SBCS    XZR, X1, X3         // resta msb: X1 - X3 - !C
                                 // C = 1 si a >= b y C = 0 si a < b 
