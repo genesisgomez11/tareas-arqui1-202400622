@@ -1,15 +1,26 @@
     .data
 fmt:            .asciz "ingrese el tipo de compuerta, solo los últimos dos dígitos:\n"
 compuerta:      .word 0
+.balign 4
 fmt2:           .asciz "%d"
-ok:             .asciz "IC. OK"
-nook:           .asciz "IC. MAL"
-mid:            .asciz "COMPUERTA %d DAÑADA"
+ok:             .asciz "IC. OK\n"
+nook:           .asciz "IC. MAL\n"
+mid:            .asciz "COMPUERTA %d DAÑADA\n"
 mascara_cero:   .word 612
+
+.balign 4
 mili:           .word 5000000
-.data
 vec7400:        .word 0, 1161, 2322, 3483
 salida7400:     .word 612, 612, 612, 0
+
+vec7408:        .word 0, 1161, 2322, 3483
+salida7408:     .word 0, 0, 0, 612
+
+vec7432:        .word 0, 1161, 2322, 3483
+salida7432:     .word 0, 612, 612, 612
+
+
+
 
 
 .text
@@ -17,7 +28,7 @@ salida7400:     .word 612, 612, 612, 0
 
 main:
 
-    stp x29, x30, [sp, #-16]!
+    stp x29, x30, [sp, #-32]!
     stp x19, x20, [sp, #16]
 
 inicio:
@@ -41,12 +52,26 @@ inicio:
 
 //001001100100
 //612
-cero:
+
+cero:                           // 7400
+    adr  x5, vec7400
+    adr  x6, salida7400
+    b    probar
+
+ocho:                           // 7408
+    adr  x5, vec7408
+    adr  x6, salida7408
+    b    probar
+
+tdos:
+    adr  x5, vec7432
+    adr  x6, salida7432
+    b    probar
+
+probar:
     mov  w19, #0              // acumulador de errores 
     adr  x2, mascara_cero
     ldr  w20, [x2]            // w20 = 612 
-    adr  x5, vec7400
-    adr  x6, salida7400
     mov  w7, #4               // 4 vectores
 
 vec_loop:
@@ -71,7 +96,7 @@ espera:
     cmp  w19, w20
     b.eq imprime_mal          // fallaron las 4 IC MAL
 
-    // falla parcial: revisar cada salida
+    //parcial
     tst  w19, #512            // d9 compuerta 1
     b.eq  c2
     mov  w1, #1
@@ -108,4 +133,7 @@ imprime_mal:
     b   fin
 
 fin:
-    b   inicio        
+    b   inicio  
+
+
+    
